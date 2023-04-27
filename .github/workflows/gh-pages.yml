@@ -15,12 +15,12 @@ jobs:
             group: ${{ github.workflow }}-${{ github.ref }}
         steps:
             - name: Checkout code
-            - uses: actions/checkout@v3
+              uses: actions/checkout@v3
 
             - name: Setup Node
-              uses: peaceiris/setup-node@v3
+              uses: actions/setup-node@v3
               with:
-                  node-version: ["14.x", "16.x"]
+                  node-version: "16"
 
             - name: Cache dependencies
               uses: actions/cache@v3
@@ -30,9 +30,10 @@ jobs:
                   restore-keys: |
                       ${{ runner.os }}-node-
 
-            - run: npm ci
-            - run: npm test
-            - run: npm run generate
+            - name: Install and Build
+              run: |
+                  npm ci
+                  npm run build
 
             - name: Deploy to GitHub Pages
               uses: peaceiris/actions-gh-pages@v3

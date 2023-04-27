@@ -1,0 +1,43 @@
+name: GitHub Pages
+
+on:
+    push:
+        branches:
+            # Set a branch name to trigger deployment
+            - main
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        concurrency:
+            group: ${{ github.workflow }}-${{ github.ref }}
+        steps:
+            - name: Checkout code
+            - uses: actions/checkout@v3
+
+            - name: Setup Node
+              uses: peaceiris/setup-node@v3
+              with:
+                  node-version: ["14.x", "16.x"]
+
+            - name: Cache dependencies
+              uses: actions/cache@v3
+              with:
+                  path: ~/.npm
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
+
+            - run: npm ci
+            - run: npm test
+            - run: npm run generate
+
+            - name: Deploy to GitHub Pages
+              uses: peaceiris/actions-gh-pages@v3
+              # If you're changing the branch from main, also change the `main` in `refs/heads/main` below accordingly.
+              if: ${{ github.ref == 'refs/heads/main' }}
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: ./dist

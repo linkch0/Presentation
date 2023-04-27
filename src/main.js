@@ -20,7 +20,8 @@ const routes = [
 
 // Create the router instance and pass the `routes` option
 const router = createRouter({
-    history: createWebHistory(),
+    // Deploy to github pages
+    history: createWebHistory("/Presentation/"),
     routes,
 });
 
